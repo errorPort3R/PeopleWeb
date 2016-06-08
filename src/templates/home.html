@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+{{#people}}
+{{first_name}} {{last_name}}<br>
+{{people}}
+<form action="/logout"  method="post" style="display: inline-block;">
+    <button type="submit">Logout</button>
+</form>
+<form action="/create-message" method="post">
+    <input type="text" name="message" placeholder="Enter a message"/>
+    <input type="hidden" name="replyId" value="{{replyId}}"/>
+    <button type="submit">Reply</button>
+</form>
+
+<br>
+{{/username}}
+{{^username}}
+<form action="/login" method="post">
+    <input type="text" name="username" placeholder="Enter your name"/>
+    <button type="submit">Login</button>
+</form><br>
+{{/username}}
+
+{{#messages}}
+<a href="/?replyId={{id}}">{{author}}: {{text}}</a><br>
+{{/messages}}
+</body>
+</html>
