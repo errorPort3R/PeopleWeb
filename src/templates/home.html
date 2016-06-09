@@ -5,29 +5,31 @@
     <title>Home</title>
 </head>
 <body>
-{{#people}}
-{{first_name}} {{last_name}}<br>
-{{people}}
-<form action="/logout"  method="post" style="display: inline-block;">
-    <button type="submit">Logout</button>
+{{#pagepeeps}}
+    <a href="/person?={{id}}">{{first_name}} {{last_name}}</a><br>
+{{/pagepeeps}}
+{{^firstpage}}
+<form action="/previous-page" method="post" style="display: inline-block;">
+    <button type="submit">Prev</button>
 </form>
-<form action="/create-message" method="post">
-    <input type="text" name="message" placeholder="Enter a message"/>
-    <input type="hidden" name="replyId" value="{{replyId}}"/>
-    <button type="submit">Reply</button>
+{{/firstpage}}
+{{^lastpage}}
+<form action="/next-page" method="post" style="display: inline-block;">
+    <button type="submit">Next</button>
 </form>
-
-<br>
-{{/username}}
-{{^username}}
-<form action="/login" method="post">
-    <input type="text" name="username" placeholder="Enter your name"/>
-    <button type="submit">Login</button>
-</form><br>
-{{/username}}
-
-{{#messages}}
-<a href="/?replyId={{id}}">{{author}}: {{text}}</a><br>
-{{/messages}}
+{{/lastpage}}<br>
+Page {{pagenumber}} of {{totalpages}}
+<form action="select-page" method="post">
+    Jump to page <input type="number" name="pageselected" placeholder="1" width=20px/>
+    <button type="submit">Go</button>
+</form>
+{{#choseperson}}
+{{#person}}
+<h3>{{first_name}} {{last_name}}</h3><br>
+{{email}}<br>
+{{country}}<br>
+{{ip_address}}
+{{/person}}
+{{/choseperson}}
 </body>
 </html>

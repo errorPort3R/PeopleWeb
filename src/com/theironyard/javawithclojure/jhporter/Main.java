@@ -13,46 +13,175 @@ import java.util.Scanner;
 
 public class Main {
 
-    public Main() {
-    }
         public static final String FILE_LOCATION = "people.txt";
+        static int currentPage = 1;
+        static ArrayList<Person> pagePeeps;
+        static boolean firstpage = true;
+        static boolean lastpage = false;
 
     public static void main(String[] args) throws FileNotFoundException
     {
 
         ArrayList<Person> people = loadPeople(FILE_LOCATION);
+        int totalPages =  (int) Math.ceil(people.size()/20);
 
         Spark.get(
                 "/",
                 (request, response ) ->
                 {
-                    String idStr = request.queryParams("replyId");
-                    int replyId = -1;
-                    if (!idStr.equals(null))
+                    pagePeeps = new ArrayList<>();
+                    String idStr = request.queryParams("id");
+                    int identity = -1;
+                    Person individual = null;
+                    boolean choseperson = false;
+
+                    if (idStr != null)
                     {
-                        replyId = Integer.valueOf(idStr);
+                        identity = Integer.valueOf(idStr);
                     }
-                    ArrayList <Message> subset = new ArrayList<Message>();
-                    for (Message msg : messages)
+                    if (identity!= -1)
                     {
-                        if (msg.replyId == replyId)
+                        individual = people.get(identity);
+                        choseperson = true;
+                    }
+
+                    if (totalPages>currentPage)
+                    {
+                        for (int i = ((currentPage - 1) * 20); i < (currentPage * 20); i++)
                         {
-                            subset.add(msg);
+                            pagePeeps.add(people.get(i));
+                        }
+                    }
+                    else
+                    {
+                        for (int i = ((currentPage - 1) * 20); i < people.size(); i++)
+                        {
+                            pagePeeps.add(people.get(i));
                         }
                     }
                     HashMap m = new HashMap();
-                    m.put("messages", subset);
-                    m.put("username", username);
-                    m.put("replyId", replyId);
+                    m.put("pagepeeps", pagePeeps);
+                    m.put("firstpage", firstpage);
+                    m.put("lastpage", lastpage);
+                    m.put("pagenumber",currentPage);
+                    m.put("totalpages", totalPages);
+                    if (idStr != null)
+                    {
+                        m.put("person", individual);
+                    }
+                    m.put("choseperson", choseperson);
+
                     return new ModelAndView(m, "home.html");
                 },
                 new MustacheTemplateEngine()
         );
+        Spark.get(
+                "/person",
+                (request, response ) ->
+                {
+                    int identity = Integer.valueOf(request.queryParams("id"));
+                    Person individual = people.get(identity);
+                    HashMap h = new HashMap();
+                    h.put("person", individual);
 
+                    return new ModelAndView(h, "person.html");
+
+                }
+        );
+        Spark.post(
+            "/next-page",
+            (request, response ) ->
+            {
+                currentPage++;
+                if (currentPage == 1)
+                {
+                    firstpage = true;
+                }
+                else
+                {
+                    firstpage= false;
+                }
+
+                if (currentPage == totalPages)
+                {
+                    lastpage = true;
+                }
+                else
+                {
+                    lastpage = false;
+                }
+                response.redirect("/");
+                return "";
+            }
+        );
+        Spark.post(
+                "/previous-page",
+                (request, response ) ->
+                {
+                    currentPage--;
+                    if (currentPage == 1)
+                    {
+                        firstpage = true;
+                    }
+                    else
+                    {
+                        firstpage= false;
+                    }
+
+                    if (currentPage == totalPages)
+                    {
+                        lastpage = true;
+                    }
+                    else
+                    {
+                        lastpage= false;
+                    }
+
+                    response.redirect("/");
+                    return "";
+                }
+        );
+        Spark.post(
+                "/select-page",
+                (request, response ) ->
+                {
+                    int chosenPage=currentPage;
+                    String pageStr = request.queryParams("pageselected");
+                    if (pageStr.isEmpty() || Integer.valueOf(pageStr)>totalPages ||Integer.valueOf(pageStr)<1)
+                    {
+
+                    }
+                    else
+                    {
+                        chosenPage = Integer.valueOf(pageStr);
+                        currentPage = chosenPage;
+                    }
+                    if (currentPage == 1)
+                    {
+                        firstpage = true;
+                    }
+                    else
+                    {
+                        firstpage= false;
+                    }
+
+                    if (currentPage == totalPages)
+                    {
+                        lastpage = true;
+                    }
+                    else
+                    {
+                        lastpage= false;
+                    }
+                    response.redirect("/");
+                    return "";
+                }
+        );
     }
 
 
-    //String id, String first_name, String last_name, String email, String country, String ip_address
+
+    //int id, String first_name, String last_name, String email, String country, String ip_address
     public static ArrayList<Person> loadPeople(String filename) throws FileNotFoundException {
         ArrayList<Person> people = new ArrayList<>();
         File f = new File(filename);
