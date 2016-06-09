@@ -21,6 +21,7 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException
     {
 
+        Spark.staticFileLocation("/public");
         ArrayList<Person> people = loadPeople(FILE_LOCATION);
         int totalPages =  (int) Math.ceil(people.size()/20);
 

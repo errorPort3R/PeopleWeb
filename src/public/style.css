@@ -1,0 +1,24 @@
+body {
+    background-color: purple;
+    color: white;
+    text-align: left;
+    text-color:white;
+
+}
+
+input[type=number] {
+    width: 30px;
+
+}
+
+a{
+    color: white;
+    text-align: left;
+    text-color: white;
+}
+
+h3 {
+    color: white;
+    text-align: left;
+
+}
