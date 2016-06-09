@@ -13,17 +13,21 @@ import java.util.Scanner;
 public class Main {
 
         public static final String FILE_LOCATION = "people.txt";
+        public static final int NAMES_PER_PAGE = 20;
         static int currentPage = 1;
         static ArrayList<Person> pagePeeps;
         static boolean firstpage = true;
         static boolean lastpage = false;
 
+
     public static void main(String[] args) throws FileNotFoundException
     {
-
-        Spark.staticFileLocation("/public");
         ArrayList<Person> people = loadPeople(FILE_LOCATION);
-        int totalPages =  (int) Math.ceil(people.size()/20);
+        double numOfEntries = people.size();
+        int totalPages = (int)Math.ceil(numOfEntries/NAMES_PER_PAGE);
+        Spark.staticFileLocation("/public");
+
+        System.out.println();
 
         Spark.get(
                 "/",
@@ -32,14 +36,14 @@ public class Main {
                     pagePeeps = new ArrayList<>();
                     if (totalPages>currentPage)
                     {
-                        for (int i = ((currentPage - 1) * 20); i < (currentPage * 20); i++)
+                        for (int i = ((currentPage - 1) * NAMES_PER_PAGE); i < (currentPage * NAMES_PER_PAGE); i++)
                         {
                             pagePeeps.add(people.get(i));
                         }
                     }
                     else
                     {
-                        for (int i = ((currentPage - 1) * 20); i < people.size(); i++)
+                        for (int i = ((currentPage - 1) * NAMES_PER_PAGE); i < people.size(); i++)
                         {
                             pagePeeps.add(people.get(i));
                         }
@@ -184,6 +188,7 @@ public class Main {
         ArrayList<Person> people = new ArrayList<>();
         File f = new File(filename);
         Scanner fileScanner =  new Scanner(f);
+        fileScanner.nextLine();
         while (fileScanner.hasNext())
         {
             String line = fileScanner.nextLine();
