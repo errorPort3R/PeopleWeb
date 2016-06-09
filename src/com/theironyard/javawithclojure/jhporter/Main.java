@@ -1,7 +1,6 @@
 package com.theironyard.javawithclojure.jhporter;
 
 import spark.ModelAndView;
-import spark.Session;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
@@ -27,24 +26,9 @@ public class Main {
 
         Spark.get(
                 "/",
-                (request, response ) ->
+                (request, response) ->
                 {
                     pagePeeps = new ArrayList<>();
-                    String idStr = request.queryParams("id");
-                    int identity = -1;
-                    Person individual = null;
-                    boolean choseperson = false;
-
-                    if (idStr != null)
-                    {
-                        identity = Integer.valueOf(idStr);
-                    }
-                    if (identity!= -1)
-                    {
-                        individual = people.get(identity);
-                        choseperson = true;
-                    }
-
                     if (totalPages>currentPage)
                     {
                         for (int i = ((currentPage - 1) * 20); i < (currentPage * 20); i++)
@@ -65,11 +49,7 @@ public class Main {
                     m.put("lastpage", lastpage);
                     m.put("pagenumber",currentPage);
                     m.put("totalpages", totalPages);
-                    if (idStr != null)
-                    {
-                        m.put("person", individual);
-                    }
-                    m.put("choseperson", choseperson);
+
 
                     return new ModelAndView(m, "home.html");
                 },
@@ -77,16 +57,33 @@ public class Main {
         );
         Spark.get(
                 "/person",
-                (request, response ) ->
+                (request, response) ->
                 {
-                    int identity = Integer.valueOf(request.queryParams("id"));
-                    Person individual = people.get(identity);
+                    String idStr = request.queryParams("id");
+                    int identity = -1;
+                    Person individual = null;
+
+                    if (idStr != null)
+                    {
+                        identity = Integer.valueOf(idStr);
+                    }
+                    if (identity!= -1)
+                    {
+                        individual = people.get(identity);
+                    }
                     HashMap h = new HashMap();
-                    h.put("person", individual);
+                    if (individual !=null)
+                    {
+                        h.put("first_name", individual.first_name);
+                        h.put("last_name", individual.last_name);
+                        h.put("email", individual.email);
+                        h.put("country", individual.country);
+                        h.put("ip_address", individual.ip_address);
 
+                    }
                     return new ModelAndView(h, "person.html");
-
-                }
+                },
+                new MustacheTemplateEngine()
         );
         Spark.post(
             "/next-page",

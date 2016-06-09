@@ -6,7 +6,8 @@
 </head>
 <body>
 {{#pagepeeps}}
-    <a href="/person?={{id}}">{{first_name}} {{last_name}}</a><br>
+    <a href="/person?id={{id}}">{{first_name}} {{last_name}}</a>
+    <br>
 {{/pagepeeps}}
 {{^firstpage}}
 <form action="/previous-page" method="post" style="display: inline-block;">
@@ -23,13 +24,6 @@ Page {{pagenumber}} of {{totalpages}}
     Jump to page <input type="number" name="pageselected" placeholder="1" width=20px/>
     <button type="submit">Go</button>
 </form>
-{{#choseperson}}
-{{#person}}
-<h3>{{first_name}} {{last_name}}</h3><br>
-{{email}}<br>
-{{country}}<br>
-{{ip_address}}
-{{/person}}
-{{/choseperson}}
+
 </body>
 </html>
